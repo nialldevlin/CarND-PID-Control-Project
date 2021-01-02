@@ -63,7 +63,7 @@ void PID::UpdateParams(double cte) {
           this->best_cte = cte;
           dp[this->curr_param] *= 1.1;
         } else {
-          p[this->curr_param] -= 2 *dp[this->curr_param];
+          p[this->curr_param] += dp[this->curr_param];
           dp[this->curr_param] *= 0.9;
         }
         t_state = 0;
