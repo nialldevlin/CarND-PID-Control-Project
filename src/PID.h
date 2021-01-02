@@ -18,7 +18,7 @@ class PID {
    * @param (Kp_, Ki_, Kd_) The initial PID coefficients
    * @param (steeringMin_, steeringMax_) Steering limits
    */
-  void Init(double Kp_, double Ki_, double Kd_, double steeringMin_, double steeringMax_);
+  void Init(double Kp_, double Ki_, double Kd_);
 
   /**
    * Calculate steering angle given CTE
@@ -42,24 +42,20 @@ class PID {
   double sum_cte;
 
   bool last_cte_init = false; //check if last cte has value
+  bool best_cte_init = false; //check if best cte has value
 
   /**
    * PID Coefficients
    */ 
-  double Kp, Ki, Kd;
-  double dp, di, dd;
+  double p[3];
+  double dp[3];
 
   /**
    * Twiddle variables
    */
   double twiddle_tolerance = 0.001;
   int curr_param = 0; //which parameter twiddle modifies: 0 - p, 1 - i, 2 - d
-  int t_state;  //Which part of the algorithm runs each loop
-
-  /**
-   * Steering limits
-   */
-  double steeringMin, steeringMax;
+  int t_state = 0;  //Which part of the algorithm runs each loop
 };
 
 #endif  // PID_H
