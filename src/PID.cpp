@@ -8,23 +8,32 @@ PID::PID() {}
 
 PID::~PID() {}
 
-void PID::Init(double Kp_, double Ki_, double Kd_) {
-  /**
-   * TODO: Initialize PID coefficients (and errors, if needed)
-   */
+void PID::Init(double Kp_, double Ki_, double Kd_, double steeringMin_, double steeringMax_) {
+  this->Kp = Kp_;
+  this->Ki = Ki_;
+  this->Kd = Kd_;
+
+  this->dp = 0.05;
+  this->di = 0.001;
+  this->dd = 0.05;
+
+  this->steeringMin = steeringMin_;
+  this->steeringMax = steeringMax_;
 
 }
 
-void PID::UpdateError(double cte) {
-  /**
-   * TODO: Update PID errors based on cte.
-   */
-
+double PID::SteeringAngle(double cte) {
+  if (!this->last_cte_init) {
+    this->last_cte = cte;
+  }
+  this->sum_cte += cte;
+  double angle = -1 * this->Kp * cte - this->Ki * sum_cte - this->Kd * (cte - last_cte);
+  this->last_cte = cte;
+  return angle;
 }
 
-double PID::TotalError() {
-  /**
-   * TODO: Calculate and return the total error
-   */
-  return 0.0;  // TODO: Add your total error calc here!
+void PID::UpdateParams(double cte) {
+  if ((this->dp + this->di + this->dd) > this->twiddle_tolerance) {
+    
+  }
 }

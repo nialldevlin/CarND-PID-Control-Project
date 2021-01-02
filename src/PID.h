@@ -16,35 +16,50 @@ class PID {
   /**
    * Initialize PID.
    * @param (Kp_, Ki_, Kd_) The initial PID coefficients
+   * @param (steeringMin_, steeringMax_) Steering limits
    */
-  void Init(double Kp_, double Ki_, double Kd_);
+  void Init(double Kp_, double Ki_, double Kd_, double steeringMin_, double steeringMax_);
 
   /**
-   * Update the PID error variables given cross track error.
+   * Calculate steering angle given CTE
    * @param cte The current cross track error
+   * @output the steering angle to be sent to the car
    */
-  void UpdateError(double cte);
+  double SteeringAngle(double cte);
 
   /**
-   * Calculate the total PID error.
-   * @output The total PID error
+   * Twiddle
+   * @params cte The curretn cross track error
    */
-  double TotalError();
+  void UpdateParams(double cte);
 
  private:
   /**
    * PID Errors
    */
-  double p_error;
-  double i_error;
-  double d_error;
+  double last_cte;
+  double best_cte;
+  double sum_cte;
+
+  bool last_cte_init = false; //check if last cte has value
 
   /**
    * PID Coefficients
    */ 
-  double Kp;
-  double Ki;
-  double Kd;
+  double Kp, Ki, Kd;
+  double dp, di, dd;
+
+  /**
+   * Twiddle variables
+   */
+  double twiddle_tolerance = 0.001;
+  int curr_param = 0; //which parameter twiddle modifies: 0 - p, 1 - i, 2 - d
+  int t_state;  //Which part of the algorithm runs each loop
+
+  /**
+   * Steering limits
+   */
+  double steeringMin, steeringMax;
 };
 
 #endif  // PID_H
