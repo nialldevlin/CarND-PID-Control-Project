@@ -22,6 +22,7 @@ void PID::Init(double Kp_, double Ki_, double Kd_) {
 double PID::SteeringAngle(double cte) {
   if (!last_cte_init) {
     last_cte = cte;
+    last_cte_init = true;
   }
   sum_cte += cte;
   double angle = (-1 * p[0] * cte) - (p[1] * sum_cte) - (p[2] * (cte - last_cte));
@@ -41,6 +42,7 @@ void PID::UpdateParams(double cte) {
   std::cout << "1. Kp: " << p[0] << " Ki: " << p[1] << " Kd: " << p[2] << std::endl;
   if(!best_cte_init) {
     best_cte = cte;
+    best_cte_init = true;
   }
   if ((dp[0] + dp[1] + dp[2]) > twiddle_tolerance) {
     switch( t_state ) {

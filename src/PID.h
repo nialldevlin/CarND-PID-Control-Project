@@ -53,7 +53,7 @@ class PID {
   /**
    * Twiddle variables
    */
-  double twiddle_tolerance = 0.0001;
+  double twiddle_tolerance = 0.00001;
   int t_id = 0; //which parameter twiddle modifies: 0 - p, 1 - i, 2 - d
   int t_state = 0;  //Which part of the algorithm runs each loop
 };

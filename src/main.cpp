@@ -2,6 +2,7 @@
 #include <uWS/uWS.h>
 #include <iostream>
 #include <string>
+#include <bits/stdc++.h> 
 #include "json.hpp"
 #include "PID.h"
 
@@ -35,9 +36,15 @@ int main() {
 
   PID pid;
   
-  pid.Init(0.1, 0.0001, 3.0);
+  //Ki should be 0 but for some reason when it is everything breaks so set it very low
+  pid.Init(0.1, 0.0001, 2);
+  int counter;  //Run twiddle every few rounds
+  double avg_angle; //Average angle over last few frames
+  std::vector<double> angles; //Holds last few frame angles
+  int numFrames = 5;
+  angles.reserve(numFrames);
 
-  h.onMessage([&pid](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, 
+  h.onMessage([&pid, &counter, &angles, &numFrames](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, 
                      uWS::OpCode opCode) {
     // "42" at the start of the message means there's a websocket message event.
     // The 4 signifies a websocket message
@@ -57,15 +64,27 @@ int main() {
           double angle = std::stod(j[1]["steering_angle"].get<string>());
           double steer_value;
           
-          steer_value = pid.SteeringAngle(cte);
-          pid.UpdateParams(cte);
+          steer_value = pid.SteeringAngle(cte); 
+          std::rotate(angles.begin(), angles.begin()+1, angles.end());
+          if(angles.size() >= numFrames) {
+            angles.back() = steer_value;
+          } else {
+            angles.push_back(steer_value);
+          }
+
+          double steer_angle = (std::accumulate(angles.begin(), angles.end(), (double)0.0)) / (double)angles.size();
+
+          if (counter % 10 == 0) {
+            pid.UpdateParams(cte);  
+          }
+          counter++;
           
           // DEBUG
-          std::cout << "CTE: " << cte << " Steering Value: " << steer_value 
+          std::cout << "CTE: " << cte << " Steering Value: " << steer_angle 
                     << std::endl;
 
           json msgJson;
-          msgJson["steering_angle"] = steer_value;
+          msgJson["steering_angle"] = steer_angle;
           msgJson["throttle"] = 0.3;
           auto msg = "42[\"steer\"," + msgJson.dump() + "]";
           std::cout << msg << std::endl;
